@@ -394,6 +394,16 @@ body{
     margin-bottom:25px;
 }
 
+.form-group .up_btn{
+    position: relative;
+}
+
+
+
+.form-group img { 
+    display: inline-block;
+}
+
 .form-group label{
     font-weight:normal;
     color:#666;
