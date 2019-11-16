@@ -11,7 +11,11 @@
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
     <script src="./libs/jquery-1.12.4.min.js"></script>
-
+    <style>
+        .up_btn {
+            margin-top: 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -24,41 +28,42 @@
                 <div class="form-group">
                     <label for="inputEmail1" class="col-sm-2 control-label">用户名称：</label>
                     <div class="col-sm-4">
-                        <input type="text" name="username" class="form-control username" id="inputEmail1" value="李思思">
+                        <input type="text" name="username" class="form-control username" id="inputEmail1" value="">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail2" class="col-sm-2 control-label">昵称：</label>
                     <div class="col-sm-4">
-                        <input type="text" name="nickname" class="form-control nickname" id="inputEmail2" value="哈哈思">
+                        <input type="text" name="nickname" class="form-control nickname" id="inputEmail2" value="">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">邮箱：</label>
                     <div class="col-sm-4">
-                        <input type="text" name="email" class="form-control email" id="inputEmail3" value="520@163.com">
+                        <input type="text" name="email" class="form-control email" id="inputEmail3" value="">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
                     <div class="col-sm-10 up_btn">
-                        <img src="images/2.jpg" alt="" class="user_pic">
+                        <label for="exampleInputFile">
+
+                            <img src="../images/上传.png" style="height: 30px; vertical-align: top; cursor: pointer;"
+                                alt="">
+                        </label>
                         <input style="display: none" name="userPic" type="file" id="exampleInputFile">
                         <!-- 给label标签的for属性赋值,值是input标签的id,那这样的话点击label就相当于点击了input -->
                         <br>
-                        <label for="exampleInputFile">
-                            上传文件
-                            <img src="../images/上传.png" style="height: 50px;" alt="">
-                        </label>
+
+                        <img src="images/2.jpg" alt="" class="user_pic">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="inputEmail4" class="col-sm-2 control-label">密码：</label>
                     <div class="col-sm-4">
-                        <input type="password" name="password" class="form-control password" id="inputEmail4"
-                            value="12345678">
+                        <input type="password" name="password" class="form-control password" id="inputEmail4" value="">
                     </div>
                 </div>
                 <div class="form-group">
@@ -69,8 +74,62 @@
             </form>
         </div>
     </div>
+    <script src="./libs/http.js"></script>
     <script>
-        
+        //入口函数
+        $(function () {
+            //一 . 页面一打开获取用户详细信息
+            function getUser() {//封装获取方法
+                $.ajax({
+                    url: BigNew.user,
+                    success: function (Data) {
+                        for (var key in Data.data) {
+                            $('.' + key).val(Data.data[key])
+                        }
+                        $('.user_pic').attr('src', Data.data.userPic)
+                    }
+                })
+            }
+            //调用获取方法
+            getUser()
+
+            //二 . 头像预览
+            $('#exampleInputFile').on('change', function () {
+                var user_icon = this.files[0];//js原生方法
+                var url = URL.createObjectURL(user_icon)
+                console.log(url);
+                $('.user_pic').attr('src', url)
+            })
+
+            //三 . 添加修改按钮修改信息
+            $('.btn-edit').on('click', function (e) {
+                e.preventDefault()
+                var fd = new FormData($('#form')[0])
+                $.ajax({
+                    type: 'post',
+                    url: BigNew.userEdit,
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    success: function (Data) {
+                        console.log(Data);
+                        if (Data.code == 200) {
+                            alert(Data.msg)
+                            // parent.window.location.reload();
+                            $.ajax({
+                                url: BigNew.userInfo,
+                                dataType: 'json',
+                                success: function (Data) {
+                                    parent.$('.user_info>span').text('欢迎' + Data.data.nickname)
+                                    parent.$('.user_info>img').attr('src', Data.data.userPic)
+                                    parent.$('.user_center_link>img').attr('src', Data.data.userPic)
+                                }
+                            })
+                        }
+                    }
+                })
+            })
+        })
     </script>
 </body>
 
