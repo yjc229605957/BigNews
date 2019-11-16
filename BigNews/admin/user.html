@@ -112,10 +112,8 @@
                     processData: false,
                     contentType: false,
                     success: function (Data) {
-                        console.log(Data);
+                        alert(Data.msg)
                         if (Data.code == 200) {
-                            alert(Data.msg)
-                            // parent.window.location.reload();
                             $.ajax({
                                 url: BigNew.userInfo,
                                 dataType: 'json',
