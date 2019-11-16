@@ -13,6 +13,8 @@
     <script src="./libs/jquery-1.12.4.min.js"></script>
     <!-- 引入模板引擎js文件 -->
     <script src="./libs/template-web.js"></script>
+    <!-- 引入服务器api地址 -->
+    <script src="./libs/http.js"></script>
 </head>
 
 <body>
@@ -27,9 +29,6 @@
                         <select id="selCategory" name="" class="form-control input-sm">
                             <option value="">所有分类</option>
                             <option>未分类</option>
-                            <option>奇趣事</option>
-                            <option>会生活</option>
-                            <option>爱旅行</option>
                         </select>
                         <select id="selStatus" name="" class="form-control input-sm">
                             <option value="">所有状态</option>
@@ -72,6 +71,46 @@
             </div>
         </div>
     </div>
+
+    <!-- 筛选下拉框模板 -->
+    <script id="category_list" type="text/html">
+        <option value="">所有分类</option>
+        {{each data v}}
+        <option value="{{v.id}}">{{v.name}}</option>
+        {{/each}}
+    </script>
+
+    <script id="wenzhang_list" type="text/html">
+        <tr>
+            <td>王积千造统最头</td>
+            <td>杰克</td>
+            <td>奇趣事</td>
+            <td class="text-center">2017-06-08 07:08:46</td>
+            <td class="text-center">已发布</td>
+            <td class="text-center">
+                <a href="article_edit.html" class="btn btn-default btn-xs">编辑</a>
+                <a href="javascript:void(0);" class="btn btn-danger btn-xs delete">删除</a>
+            </td>
+        </tr>
+    </script>
+
+    <script>
+        //入口函数
+        $(function(){
+            //一 .打开页面获取所有分类渲染到分类筛选下拉框
+            $.ajax({
+                url: BigNew.CGlist,
+                dataType: 'json',
+                success: function(Data){
+                    //使用模板引擎渲染
+                    var newHtml = template('category_list',Data)
+                    $('#selCategory').html(newHtml)
+                }
+            })
+
+
+        })
+    </script>
 </body>
 
 </html>

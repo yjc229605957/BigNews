@@ -160,10 +160,12 @@
                         },
                         dataType: 'json',
                         success: function (Data) {
-                            alert(Data.msg)
+                            // alert(Data.msg)
                             $('#myModal').modal('hide')
                             if (Data.code == 200) {
                                 getData();
+                            }else{
+                                alert('分类名称或分类别名重复')
                             }
                         }
                     });

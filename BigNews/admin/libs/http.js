@@ -1,5 +1,5 @@
 (function(w){
-    var baseUrl = 'http://localhost:8080/api/v1';
+    var baseUrl = 'http://localhost:8080/api/v1';//基地址
     var BigNew = {
         //用户登录
         login: baseUrl+'/admin/user/login',//用户登录
