@@ -94,34 +94,89 @@
         {{/each}}
     </script>
 
-    <!-- 分页插件js -->
+
     <script type="text/javascript">
-        $("#pager").zPager({
-            totalData: 50,
-            htmlBox: $('#wraper'),
-            btnShow: true,
-            ajaxSetData: false
-        });
-        $("#pager").zPager({
-            totalData: 50,
-            htmlBox: $('#wraper'),
-            btnShow: true,
-            ajaxSetData: false,
-            dataRender: function (data) {
-                console.log(data + '---data-2');
-            },
-        });
+        //一 .打开页面获取所有分类渲染到分类筛选下拉框
+        $.ajax({
+            url: BigNew.CGlist,
+            dataType: 'json',
+            success: function (Data) {
+                //使用模板引擎渲染
+                var newHtml = template('category_list', Data)
+                $('#selCategory').html(newHtml)
+            }
+        })
+
+
+        //分页页码点击
         function currentPage(currentPage) {
-            /*
-                触发页码数位置： Page/js/jquery.z-pager.js 64行
-            */
-            console.log(currentPage);
+            $.ajax({
+                url: BigNew.CGquery,
+                dataType: 'json',
+                data: {
+                    page: parseInt(currentPage),
+                    perpage: 10,
+                    type: $('#selCategory').val(),
+                    state: $('#selStatus').val()
+                },
+                success: function (Data) {
+                    console.log(Data);
+                    var newHtml = template('wenzhang_list', Data.data)
+                    $('.table-striped>tbody').html(newHtml)
+                }
+            })
         }
+
+        //封装分页代码
+        function fenye(totalPages, startPage) {
+            $("#pager").zPager({
+                totalData: totalPages,
+                pageData: 10,
+                htmlBox: $('#wraper'),
+                pageCount: startPage,
+                btnShow: true,
+                ajaxSetData: false,
+                dataRender: function (data) {
+                    console.log(data + '---data-2');
+                },
+            })
+        };
+
+
+        //二 .筛选按钮获取数据
+        $('#btnSearch').on('click', function (e) {
+            e.preventDefault();
+            getArticleList()
+        })
+        //进入页面获取所有文章数据
+        $('#btnSearch').trigger('click')
+
+        //根据页数请求文章列表
+        function getArticleList(currentPage) {
+            $.ajax({
+                url: BigNew.CGquery,
+                dataType: 'json',
+                data: {
+                    page: currentPage,
+                    perpage: 10,
+                    type: $('#selCategory').val(),
+                    state: $('#selStatus').val()
+                },
+                success: function (Data) {
+                    console.log(Data);
+                    var newHtml = template('wenzhang_list', Data.data)
+                    $('.table-striped>tbody').html(newHtml)
+                    fenye(Data.data.totalCount, Data.data.totalPage)
+
+                }
+            })
+        }
+
+
+
     </script>
 
-    <script>
-        
-    </script>
+    <!-- <script src="./js/article_list.js"></script> -->
 
 
 </body>
