@@ -10,11 +10,14 @@
     <link rel="stylesheet" href="./css/reset.css">
     <link rel="stylesheet" href="./css/iconfont.css">
     <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./分页插件/page.css">
     <script src="./libs/jquery-1.12.4.min.js"></script>
     <!-- 引入模板引擎js文件 -->
     <script src="./libs/template-web.js"></script>
     <!-- 引入服务器api地址 -->
     <script src="./libs/http.js"></script>
+    <!-- 引入分页插件 -->
+    <script src="./分页插件/jquery.z-pager.js"></script>
 </head>
 
 <body>
@@ -54,20 +57,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>王积千造统最头</td>
-                        <td>杰克</td>
-                        <td>奇趣事</td>
-                        <td class="text-center">2017-06-08 07:08:46</td>
-                        <td class="text-center">已发布</td>
-                        <td class="text-center">
-                            <a href="article_edit.html" class="btn btn-default btn-xs">编辑</a>
-                            <a href="javascript:void(0);" class="btn btn-danger btn-xs delete">删除</a>
-                        </td>
-                    </tr>
+
                 </tbody>
             </table>
+            <!-- 分页插件 -->
             <div class="row text-center">
+            </div>
+            <div style="text-align: center;margin:26px auto 10px;">
+                <div id="pager" class="pager clearfix"></div>
             </div>
         </div>
     </div>
@@ -80,37 +77,53 @@
         {{/each}}
     </script>
 
+    <!-- 文章模板 -->
     <script id="wenzhang_list" type="text/html">
+        {{each data v}}
         <tr>
-            <td>王积千造统最头</td>
-            <td>杰克</td>
-            <td>奇趣事</td>
-            <td class="text-center">2017-06-08 07:08:46</td>
-            <td class="text-center">已发布</td>
+            <td>{{v.title}}</td>
+            <td>{{v.author}}</td>
+            <td>{{v.category}}</td>
+            <td class="text-center">{{v.date}}</td>
+            <td class="text-center">{{v.state}}</td>
             <td class="text-center">
-                <a href="article_edit.html" class="btn btn-default btn-xs">编辑</a>
+                <a href="./article_edit.html" class="btn btn-default btn-xs">编辑</a>
                 <a href="javascript:void(0);" class="btn btn-danger btn-xs delete">删除</a>
             </td>
         </tr>
+        {{/each}}
+    </script>
+
+    <!-- 分页插件js -->
+    <script type="text/javascript">
+        $("#pager").zPager({
+            totalData: 50,
+            htmlBox: $('#wraper'),
+            btnShow: true,
+            ajaxSetData: false
+        });
+        $("#pager").zPager({
+            totalData: 50,
+            htmlBox: $('#wraper'),
+            btnShow: true,
+            ajaxSetData: false,
+            dataRender: function (data) {
+                console.log(data + '---data-2');
+            },
+        });
+        function currentPage(currentPage) {
+            /*
+                触发页码数位置： Page/js/jquery.z-pager.js 64行
+            */
+            console.log(currentPage);
+        }
     </script>
 
     <script>
-        //入口函数
-        $(function(){
-            //一 .打开页面获取所有分类渲染到分类筛选下拉框
-            $.ajax({
-                url: BigNew.CGlist,
-                dataType: 'json',
-                success: function(Data){
-                    //使用模板引擎渲染
-                    var newHtml = template('category_list',Data)
-                    $('#selCategory').html(newHtml)
-                }
-            })
-
-
-        })
+        
     </script>
+
+
 </body>
 
 </html>
