@@ -65,6 +65,7 @@
             </div>
             <div style="text-align: center;margin:26px auto 10px;">
                 <div id="pager" class="pager clearfix"></div>
+                <div class="info">没有数据</div>
             </div>
         </div>
     </div>
@@ -87,8 +88,8 @@
             <td class="text-center">{{v.date}}</td>
             <td class="text-center">{{v.state}}</td>
             <td class="text-center">
-                <a href="./article_edit.html" class="btn btn-default btn-xs">编辑</a>
-                <a href="javascript:void(0);" class="btn btn-danger btn-xs delete">删除</a>
+                <a href="./article_edit.html" class="btn btn-default btn-xs" data-id="{{v.id}}">编辑</a>
+                <a href="javascript:void(0);" class="btn btn-danger btn-xs delete" data-id="{{v.id}}">删除</a>
             </td>
         </tr>
         {{/each}}
@@ -108,30 +109,18 @@
         })
 
 
-        //分页页码点击
+        //分页页码被点击时触发的函数(插件方法,却没有说明非常垃圾)
         function currentPage(currentPage) {
-            $.ajax({
-                url: BigNew.CGquery,
-                dataType: 'json',
-                data: {
-                    page: parseInt(currentPage),
-                    perpage: 10,
-                    type: $('#selCategory').val(),
-                    state: $('#selStatus').val()
-                },
-                success: function (Data) {
-                    console.log(Data);
-                    var newHtml = template('wenzhang_list', Data.data)
-                    $('.table-striped>tbody').html(newHtml)
-                }
-            })
+            getArticleList(parseInt(currentPage));
         }
 
         //封装分页代码
-        function fenye(totalPages, startPage) {
+        function fenye(totalPages, startPage, current) {
+            var cur = current || 1;
             $("#pager").zPager({
                 totalData: totalPages,
                 pageData: 10,
+                current: cur,
                 htmlBox: $('#wraper'),
                 pageCount: startPage,
                 btnShow: true,
@@ -142,17 +131,8 @@
             })
         };
 
-
-        //二 .筛选按钮获取数据
-        $('#btnSearch').on('click', function (e) {
-            e.preventDefault();
-            getArticleList()
-        })
-        //进入页面获取所有文章数据
-        $('#btnSearch').trigger('click')
-
-        //根据页数请求文章列表
-        function getArticleList(currentPage) {
+        //封装请求文章列表方法,参数1页码数,参数二回调函数(在有传入参数时才调用)
+        function getArticleList(currentPage, huidiao) {
             $.ajax({
                 url: BigNew.CGquery,
                 dataType: 'json',
@@ -164,20 +144,64 @@
                 },
                 success: function (Data) {
                     console.log(Data);
-                    var newHtml = template('wenzhang_list', Data.data)
-                    $('.table-striped>tbody').html(newHtml)
-                    fenye(Data.data.totalCount, Data.data.totalPage)
-
+                    if (Data.code == 200) {
+                        var newHtml = template('wenzhang_list', Data.data);
+                        $('.table-striped>tbody').html(newHtml);
+                        if (huidiao == undefined) {
+                            return
+                        } else {
+                            huidiao(Data)
+                        }
+                        if (Data.data.data.length == 0 && currentPage == 1) {
+                            $('#pager').hide();
+                            $('.info').show()
+                        } else {
+                            $('#pager').show();
+                            $('.info').hide()
+                        }
+                    }
                 }
             })
         }
 
+        //二 .筛选按钮获取数据
+        $('#btnSearch').on('click', function (e) {
+            e.preventDefault();
+            getArticleList(1, function (Data) {
+                fenye(Data.data.totalCount, Data.data.totalPage)
+            })
+        })
+        //进入页面触发筛选默认值获取所有文章数据
+        $('#btnSearch').trigger('click')
 
-
+        //三 .删除文章
+        $('.table-striped>tbody').on('click', '.delete', function () {
+            if (confirm('确定删除此文章吗?')) {
+                $.ajax({
+                    type: 'post',
+                    url: BigNew.ARdel,
+                    data: {
+                        id: $(this).attr('data-id')
+                    },
+                    success: function (Data) {
+                        if (Data.code == 204) {
+                            if ($('tbody').children().length <= 1) {
+                                //判断是否是最后一篇文章
+                                var pageNum = ($('.current').attr('page-id') - 1)
+                                //把当前页的上一页存起来
+                                getArticleList(pageNum, function (Data) {
+                                    //当这一页的文章为0时传入上一页页码获取文章数据,根据传回的文章长度和页数,以及当前分页数,重新渲染分页插件
+                                    fenye(Data.data.totalCount, Data.data.totalPage, pageNum)
+                                });
+                            } else {//不是最后一篇文章时正常获取数据
+                                getArticleList($('.current').attr('page-id'));
+                            }
+                        }
+                    }
+                })
+            }
+        })
     </script>
-
-    <!-- <script src="./js/article_list.js"></script> -->
-
 
 </body>
 
