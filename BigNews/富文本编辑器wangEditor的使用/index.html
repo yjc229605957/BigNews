@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div id="editor">
+        <p>传智播客 <b>黑马程序员</b> 美女田连月薪过万,人好看钱又多.</p>
+    </div>
+
+    <br>
+    <br>
+    <button id="btnGet">读取内容</button>
+    <button id="btnSet">设置内容</button>
+
+    <script src="./jquery-1.12.4.min.js"></script>
+    <script src="./wangEditor.js"></script>
+    <script type="text/javascript">
+        var E = window.wangEditor;
+        var editor = new E('#editor');
+        // 或者 var editor = new E( document.getElementById('editor') )
+        editor.create()
+
+
+        //读取内容
+        $('#btnGet').on('click',function(){
+            console.log(editor.txt.html());
+            console.log(editor.txt.text());
+        });
+
+
+        //设置内容
+        $('#btnSet').on('click',function(){
+            editor.txt.html('<p>用 JS 设置的内容</p>')
+        });
+
+
+    </script>
+
+</body>
+
+</html>
