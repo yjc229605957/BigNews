@@ -69,7 +69,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章内容：</label>
@@ -87,6 +86,8 @@
             </form>
         </div>
     </div>
+
+    <!-- 分类下拉菜单模板 -->
     <script id="category_list" type="text/html">
         {{each data v}}
             <option value="{{v.id}}">{{v.name}}</option>
@@ -166,7 +167,7 @@
                     contentType: false,
                     processData: false,
                     success: function (Data) {
-                        alert(Data);
+                        alert(Data.msg);
                         if (Data.code == 200) {
                             window.history.back();//返回上一页
                         }
@@ -187,7 +188,7 @@
                     contentType: false,
                     processData: false,
                     success: function (Data) {
-                        alert(Data);
+                        alert(Data.msg)
                         if (Data.code == 200) {
                             window.history.back();//返回上一页
                         }

@@ -32,11 +32,11 @@
                     <b class="iconfont icon-arrowdownl"></b></a></div>
             <ul class="level02">
                 <li><a href="./article_list.html" target="myIframe">
-                    <i class="iconfont icon-previewright"></i><span>文章列表</span></a></li>
+                        <i class="iconfont icon-previewright"></i><span>文章列表</span></a></li>
                 <li><a href="./article_release.html" target="myIframe">
-                    <i class="iconfont icon-previewright"></i><span>发表文章</span></a></li>
+                        <i class="iconfont icon-previewright"></i><span>发表文章</span></a></li>
                 <li><a href="./article_category.html" target="myIframe">
-                    <i class="iconfont icon-previewright"></i><span>文章类别管理</span></a>
+                        <i class="iconfont icon-previewright"></i><span>文章类别管理</span></a>
                 </li>
             </ul>
 
@@ -64,6 +64,15 @@
     </div>
     <script src="./libs/http.js"></script>
     <script src="./js/idnex.js"></script>
+    <script>
+        $.ajax({
+            url: 'http://localhost:8080/api/v1/admin/data/article',
+            success: function(data){
+                console.log(data);
+                
+            }
+        })
+    </script>
 </body>
 
 </html>

@@ -193,7 +193,9 @@
                                     fenye(Data.data.totalCount, Data.data.totalPage, pageNum)
                                 });
                             } else {//不是最后一篇文章时正常获取数据
-                                getArticleList($('.current').attr('page-id'));
+                                getArticleList($('.current').attr('page-id'),function(Data){
+                                    fenye(Data.data.totalCount, Data.data.totalPage,$('.current').attr('page-id'))
+                                });
                             }
                         }
                     }
