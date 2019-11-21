@@ -34,12 +34,16 @@ $(function () {
             processData: false,
             contentType: false,
             success: function (Data) {
+                console.log(Data);
+                
                 alert(Data.msg)
                 if (Data.code == 200) {
                     $.ajax({
                         url: BigNew.userInfo,
                         dataType: 'json',
                         success: function (Data) {
+                            console.log(Data);
+                            
                             parent.$('.user_info>span').text('欢迎' + Data.data.nickname)
                             parent.$('.user_info>img').attr('src', Data.data.userPic)
                             parent.$('.user_center_link>img').attr('src', Data.data.userPic)

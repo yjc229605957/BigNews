@@ -8,7 +8,7 @@
         rank: baseUrl+'/index/rank',//文章热门排行
         latest: baseUrl+'/index/latest',//最新资讯
         attention: baseUrl+'/index/attention',//焦点关注
-        artitle: baseUrl+'/index/artitle',//文章详细内容
+        article: baseUrl+'/index/article',//文章详细内容
         //评论
         latest_com:baseUrl+'/index/latest_comment',//最新评论
         post_com: baseUrl+'/index/post_comment',//发布评论

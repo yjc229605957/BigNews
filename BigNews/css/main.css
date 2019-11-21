@@ -163,6 +163,11 @@ body{
     width:750px;
     float: left;
 }
+
+.setfr_con{
+    width:750px;
+}
+
 .right_con{
     width:250px;
     float:right;
@@ -477,7 +482,7 @@ body{
     padding:20px 0 15px 0;
 }
 
-.article_con p{
+.article_con {
     margin:20px 0;
     font-size:14px;
     line-height:24px;

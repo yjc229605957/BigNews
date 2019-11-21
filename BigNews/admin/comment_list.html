@@ -10,8 +10,14 @@
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/iconfont.css">
   <link rel="stylesheet" href="css/main.css">
+  <!-- 引入分页插件css -->
+  <link rel="stylesheet" href="./分页插件/page.css">
+  <!-- 引入js -->
   <script src="./libs/jquery-1.12.4.min.js"></script>
+  <!-- 引入temp模板引擎 -->
   <script src="./libs/template-web.js"></script>
+  <!-- 引入分页插件js -->
+  <script src="./分页插件/jquery.z-pager.js"></script>
 </head>
 
 <body>
@@ -141,25 +147,190 @@
           </tr>
         </tbody>
       </table>
-      <div class="row text-center">
-        <ul class="pagination pagination-sm">
-          <li class="page-item first disabled"><a href="#" class="page-link">首页</a></li>
-          <li class="page-item prev disabled"><a href="#" class="page-link">上一页</a></li>
-          <li class="page-item active"><a href="#" class="page-link">1</a></li>
-          <li class="page-item"><a href="#" class="page-link">2</a></li>
-          <li class="page-item"><a href="#" class="page-link">3</a></li>
-          <li class="page-item"><a href="#" class="page-link">4</a></li>
-          <li class="page-item"><a href="#" class="page-link">5</a></li>
-          <li class="page-item"><a href="#" class="page-link">6</a></li>
-          <li class="page-item"><a href="#" class="page-link">7</a></li>
-          <li class="page-item next"><a href="#" class="page-link">下一页</a></li>
-          <li class="page-item last"><a href="#" class="page-link">尾页</a></li>
-        </ul>
-        <ul id="pagination" class="pagination-sm"></ul>
-      </div>
 
+      <!-- 分页插件   height:95px -->
+      <div class="row text-center">
+      </div>
+      <div style="text-align:center; margin:26px auto 10px;">
+        <div id="pager" class="pager clearfix"></div>
+      </div>
     </div>
   </div>
+
+  <!-- 评论模板 -->
+  <script id="comment_temp" type="text/html">
+    {{each data v}}
+      {{if v.state == '待审核'}}
+        <tr class="danger">
+      {{else}}
+        <tr>
+      {{/if}}
+        <td>{{v.author}}</td>
+        <td>{{v.content}}</td>
+        <td>《{{v.title}}》</td>
+        <td>{{v.date}} {{v.time}}</td>
+        <td>{{v.state}}</td>
+        <td class="text-center" data-id='{{v.articleId}}'>
+          {{if v.state == '待审核'}}
+          <a href="javascript:void(0);;" class="btn btn-info btn-xs" data-id='{{v.id}}'>批准</a>
+          <a href="javascript:void(0);;" class="btn btn-danger btn-xs" data-id='{{v.id}}'>删除</a>
+          {{else if v.state == '已通过'}}
+          <a href="javascript:;" class="btn btn-warning btn-xs" data-id='{{v.id}}'>拒绝</a>
+          <a href="javascript:void(0);;" class="btn btn-danger btn-xs" data-id='{{v.id}}'>删除</a>
+          {{else if v.state == '已拒绝'}}
+          <a href="javascript:void(0);;" class="btn btn-danger btn-xs" data-id='{{v.id}}'>删除</a>
+          {{/if}}
+        </td>
+      </tr>
+    {{/each}}
+
+  </script>
+
+
+  <!-- 引入服务器api文件 -->
+  <script src="./libs/http.js"></script>
+
+  <script>
+    //入口函数
+    $(function () {
+      //一 .进入页面获取评论并渲染分页插件
+      get_comment(1, function (Data) {
+        fenye(Data.data.totalCount, Data.data.totalPage)
+      })
+
+      //封装获取评论方法
+      function get_comment(page, huidiao) {
+        $.ajax({
+          url: BigNew.comtSec,
+          data: {
+            page: page,
+            perpage: 10,
+          },
+          success: function (Data) {
+            // console.log(Data);
+            var newHtml = template('comment_temp', Data.data)
+            $('.table-striped.table-bordered>tbody').html(newHtml)
+            if (huidiao == undefined) {
+              return
+            } else {
+              huidiao(Data)
+            }
+          }
+        })
+      }
+
+      //封装分页代码
+      function fenye(totalPages, startPage, current) {
+        var cur = current || 1;
+        $("#pager").zPager({
+          totalData: totalPages,
+          pageData: 10,
+          current: cur,
+          htmlBox: $('#wraper'),
+          pageCount: startPage,
+          btnShow: true,
+          ajaxSetData: false,
+          dataRender: function (data) {
+            console.log(data + '---data-2');
+          },
+        })
+      };
+
+      //分页页码被点击时触发的函数(插件方法,却没有说明非常垃圾)
+      function currentPage(currentPage) {
+        get_comment(currentPage);
+      }
+
+      //二 .评论审核通过
+      $('.table-striped.table-bordered>tbody').on('click', '.btn-info', function () {
+        var id = $(this).attr('data-id')//获取评论id
+        var cur = $('.current').attr('page-id')//获取分页页码数
+        if (confirm('确认通过该评论吗?')) {
+          $.ajax({
+            url: BigNew.comtPass,
+            type: 'post',
+            data: {
+              id: id
+            },
+            success: function (Data) {
+              alert(Data.msg)
+              if (Data.code == 200) {
+                //成功后按照页码数重新获取评论
+                get_comment(cur, function (Data) {
+                  fenye(Data.data.totalCount, Data.data.totalPage, cur)
+                })
+              }
+            }
+          })
+        }
+      })
+
+      //三 .评论审核不通过
+      $('.table-striped.table-bordered>tbody').on('click', '.btn-warning', function () {
+        var id = $(this).attr('data-id')//获取评论id
+        var cur = $('.current').attr('page-id')//获取分页页码数
+        if (confirm('确认拒绝该评论吗?')) {
+          $.ajax({
+            url: BigNew.comtReject,
+            type: 'post',
+            data: {
+              id: id
+            },
+            success: function (Data) {
+              alert(Data.msg)
+              if (Data.code == 200) {
+                //成功后按照页码数重新获取评论
+                get_comment(cur, function (Data) {
+                  fenye(Data.data.totalCount, Data.data.totalPage, cur)
+                })
+              }
+            }
+          })
+        }
+      })
+
+      //四 .删除评论
+      $('.table-striped.table-bordered>tbody').on('click', '.btn-danger', function () {
+        var id = $(this).attr('data-id')//获取评论id
+        var cur = $('.current').attr('page-id')//获取分页页码数
+            if (confirm('确定删除此评论吗?')) {
+                $.ajax({
+                    type: 'post',
+                    url: BigNew.comtDel,
+                    data: {
+                        id: id
+                    },
+                    success: function (Data) {
+                      console.log(Data);
+                      alert(Data.msg)
+                        if (Data.code == 200) {
+                            if ($('tbody').children().length <= 1) {
+                                //判断是否是最后一篇文章
+                                var pageNum = (cur - 1)
+                                //把当前页的上一页存起来
+                                get_comment(pageNum, function (Data) {
+                                    //当这一页的文章为0时传入上一页页码获取文章数据,根据传回的文章长度和页数,以及当前分页数,重新渲染分页插件
+                                    fenye(Data.data.totalCount, Data.data.totalPage, pageNum)
+                                });
+                            } else {//不是最后一篇文章时正常获取数据
+                              get_comment(cur,function(Data){
+                                    fenye(Data.data.totalCount, Data.data.totalPage,cur)
+                                });
+                            }
+                        }
+                    }
+                })
+            }
+        })
+
+
+
+      //把分页页码触发函数暴露给window
+      window.currentPage = currentPage;
+
+    })
+  </script>
+
 </body>
 
 </html>
