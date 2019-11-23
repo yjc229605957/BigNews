@@ -161,26 +161,19 @@
                 console.log(Data);
                 // 基于准备好的dom，初始化echarts实例
                 var myChart1 = echarts.init(document.getElementById('pie_show'));
-                var data1 = []
-                var data2 = []
+                var data1 = []//数据1
+                var data2 = []//数据2
                 for (let key in Data.date) {
                     data2[key] = Data.date[key]
                     data2[key].value = Data.date[key].articles
                     data1.push(Data.date[key].name);
                     delete data2[key].articles
                 }
-                
                 // for(let i=0;i<Data.date.length;i++){
                 //     let{name,articles:value} = Data.date[i]
                 //     data2[i] = {name,value}
                 // }
-                console.log(data1,data2);
-
-                // for (var i = 0; i < Data.date.length; i++) {
-                //     data1.push(Data.date[i].name);
-                // }
-                // console.log(data1);
-                
+                console.log(data1, data2);
                 option1 = {
                     title: {
                         text: '分类文章数量比',
@@ -196,12 +189,13 @@
                         x: 'center',
                         data: data1
                     },
+                    color: ['#f88', '#fad', '#6fc', 'skyblue', 'pink', '#4d0'],
                     series: [
                         {
                             name: '分类文章数量比',
                             type: 'pie',
-                            radius: ['50%', '70%'],
-                            color: ['red', 'yellow', 'skyblue', 'pink', '#0f0'],
+                            center: ['50%', '58%'],//饼图的位置
+                            radius: ['50%', '70%'],//饼图形状调节
                             avoidLabelOverlap: false,
                             label: {
                                 normal: {
@@ -221,15 +215,7 @@
                                     show: true,
                                 }
                             },
-                            
-                            data:data2
-                            // [
-                            //     { value: 335, name: '爱生活' },
-                            //     { value: 310, name: '趣美味' },
-                            //     { value: 234, name: '爱旅行' },
-                            //     { value: 135, name: '爱电影' },
-                            //     { value: 548, name: '爱运动' }
-                            // ]
+                            data: data2
                         }
                     ]
                 }
@@ -242,76 +228,82 @@
     </script>
     <!-- 柱状图 -->
     <script>
-        // 基于准备好的dom，初始化echarts实例
-        var myChart2 = echarts.init(document.getElementById('column_show'));
-
-        option2 = {
-            title: {
-                left: 'center',
-                text: '分类访问量',
-            },
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {            // 坐标轴指示器，坐标轴触发有效
-                    type: 'line'        // 默认为直线，可选为：'line' | 'shadow'
-                },
-
-            },
-            legend: {
-                data: ['爱生活', '趣美味', '爱旅行', '爱电影', '爱游泳'],
-                top: 30
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            xAxis: [
-                {
-                    type: 'category',
-                    data: ['一月', '二月', '三月', '四月']
-                }
-            ],
-            yAxis: [
-                {
-                    type: 'value'
-                }
-            ],
-            color: ['#5885e8', '#13cfd5', '#00ce68', '#ff9565', '#20ff19'],
-            series: [
-                {
-                    name: '爱生活',
-                    type: 'bar',
-                    data: [320, 332, 301, 334]
-                },
-                {
-                    name: '趣美味',
-                    type: 'bar',
-                    data: [220, 132, 101, 134]
-                },
-                {
-                    name: '爱旅行',
-                    type: 'bar',
-                    data: [220, 182, 191, 234]
-                },
-                {
-                    name: '爱电影',
-                    type: 'bar',
-                    data: [150, 232, 201, 154]
-                },
-                {
-                    name: '爱游泳',
-                    type: 'bar',
-                    data: [262, 118, 364, 426],
-                },
-
-            ]
-        };
+        $.ajax({
+            url: BigNew.dataVisit,
+            success: function (backData) {
+                console.log(backData);
+                
 
 
-        // 使用刚指定的配置项和数据显示图表。
-        myChart2.setOption(option2);
+
+                // 基于准备好的dom，初始化echarts实例
+                var myChart2 = echarts.init(document.getElementById('column_show'));//准备一个盒子创建一个echarts实例
+                option2 = {
+                    title: {
+                        left: 'center',
+                        text: '日访问量统计',
+                    },
+                    tooltip: {//提示组件
+                        trigger: 'axis',//触发类型:坐标系(柱状图可用)
+                        axisPointer: {//坐标轴指示器
+                            type: 'line'//指示器类型: 直线指示器  可选shadow阴影  cross十字
+                        }
+                    },
+                    legend: {//图例组件
+                        data: ['爱生活', '趣美味', '爱旅行', '爱电影', '爱运动'],//数据: 有几个类型
+                        top: 30,
+                    },
+                    grid: {//直角坐标系内绘制网格 说人话就是: 刻度表
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true//是否显示刻度标签
+                    },
+                    xAxis: [//x坐标轴
+                        {
+                            type: 'category',//坐标轴类型: 类目轴
+                            data: ['一月', '二月', '三月', '四月']//数据: 有几个类目
+                        }
+                    ],
+                    yAxis: [
+                        {
+                            type: 'value'//坐标轴类型: 数值轴
+                        }
+                    ],
+                    color: ['#6092ff', '#14e3ea', '#00e272', '#ffa36f', '#23ff1b'],//每行数据的颜色
+                    series: [//图表类型
+                        {
+                            name: '爱生活',//每个对象就是一个图例数据 , 数据名
+                            type: 'bar',//柱状图
+                            data: [320, 332, 301, 334]//每个类目的数据
+                        },
+                        {
+                            name: '趣美味',
+                            type: 'bar',
+                            data: [220, 182, 191, 234]
+                        },
+                        {
+                            name: '爱旅行',
+                            type: 'bar',
+                            data: [150, 232, 201, 154]
+                        },
+                        {
+                            name: '爱电影',
+                            type: 'bar',
+                            data: [98, 77, 101, 99]
+                        },
+                        {
+                            name: '爱运动',
+                            type: 'bar',
+                            data: [127, 147, 86, 89]
+                        }
+                    ]
+                };
+                // 使用刚指定的配置项和数据显示图表。
+                myChart2.setOption(option2);//将制定好的图表显示在实例中
+            }
+        })
+
     </script>
 
 
@@ -327,7 +319,6 @@
                     $('.spannel.scolor01>em').text(Data.dayArticle);
                     $('.spannel.scolor02>em').text(Data.totalComment);
                     $('.spannel.scolor03>em').text(Data.dayComment);
-
                 }
             })
 
@@ -336,7 +327,6 @@
                 url: BigNew.dataArticle,
                 success: function (data) {
                     console.log(data);
-
                 }
             })
 
